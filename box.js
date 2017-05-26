@@ -79,7 +79,8 @@ function plot(box_list)
     var level_index = 0;
     var region_index = 0;
     var box_index = 1;
-    while (box_index < box_list.length)
+    var bump_count = 0;
+    while (box_index < box_list.length && bump_count < 4)
     {
 	var level = levels[level_index];
 	var region = level[region_index];
@@ -92,6 +93,7 @@ function plot(box_list)
 	    {
 		region_index = 0;
 	    }
+	    bump_count++;
 	}
 	
 	if (region.orientation === "left")
@@ -141,6 +143,7 @@ function plot(box_list)
 	plot_box(box);
 
 	bump();
+	bump_count = 0;
     	box_index++;
     }
 }
