@@ -52,25 +52,25 @@ function plot(box_list)
 	    orientation:"left",
 	    origin:first.left,
 	    base:first.top,
-	    limit:Infinity,
+	    limit:first.left+first.width*2,
 	},
 	{
 	    orientation:"top",
 	    origin:first.top,
 	    base:first.left+first.width,
-	    limit:Infinity,
+	    limit:first.top+first.height*2,
 	},
 	{
 	    orientation:"right",
 	    origin:first.left+first.width,
 	    base:first.top+first.height,
-	    limit:Infinity,
+	    limit:first.left-first.width,
 	},
 	{
 	    orientation:"bottom",
 	    origin:first.top+first.height,
 	    base:first.left,
-	    limit:Infinity,
+	    limit:first.top-first.height,
 	}
     ];
     var levels = [first_regions];
@@ -85,39 +85,63 @@ function plot(box_list)
 	var region = level[region_index];
 	var box = box_list[box_index];
 
-	switch (region.orientation)
+	var bump = function()
 	{
-	    case "left":
+	    region_index++;
+	    if (region_index == level.length)
+	    {
+		region_index = 0;
+	    }
+	}
+	
+	if (region.orientation === "left")
+	{
+	    if (region.origin + box.width > region.limit)
+	    {
+		bump();
+		continue;
+	    }
 	    box.top = region.base - box.height;
 	    box.left = region.origin;
 	    region.origin = region.origin + box.width;
-	    break;
-	    case "top":
+	}
+	else if (region.orientation === "top")
+	{
+	    if (region.origin + box.height > region.limit)
+	    {
+		bump();
+		continue;
+	    }
 	    box.top = region.origin;
 	    box.left = region.base;
 	    region.origin = region.origin + box.height;
-	    break;
-	    case "right":
+	}
+	else if (region.orientation === "right")
+	{
+	    if (region.origin - box.width < region.limit)
+	    {
+		bump();
+		continue;
+	    }
 	    box.top = region.base;
 	    box.left = region.origin - box.width;
 	    region.origin = region.origin - box.width;
-	    break;
-	    case "bottom":
+	}
+	else if (region.orientation === "bottom")
+	{
+	    if (region.origin - box.height < region.limit)
+	    {
+		bump();
+		continue;
+	    }
 	    box.top = region.origin - box.height;
 	    box.left = region.base - box.width;
 	    region.origin = region.origin - box.height;
-	    break;
 	}
-
-	region_index++;
-	if (region_index == level.length)
-	{
-	    region_index = 0;
-	}
-
-    	box_index++;
-
 	plot_box(box);
+
+	bump();
+    	box_index++;
     }
 }
 
