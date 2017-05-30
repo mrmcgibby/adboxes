@@ -42,110 +42,129 @@ function plot_box(box)
 
 function plot(box_list)
 {
-    var first = box_list[0];
-    first.top = 0;
-    first.left = 0;
-    plot_box(first);
-
-    var first_regions =	[
-	{
-	    orientation:"left",
-	    origin:first.left,
-	    base:first.top,
-	    limit:first.left+first.width*2,
-	},
-	{
-	    orientation:"top",
-	    origin:first.top,
-	    base:first.left+first.width,
-	    limit:first.top+first.height*2,
-	},
-	{
-	    orientation:"right",
-	    origin:first.left+first.width,
-	    base:first.top+first.height,
-	    limit:first.left-first.width,
-	},
-	{
-	    orientation:"bottom",
-	    origin:first.top+first.height,
-	    base:first.left,
-	    limit:first.top-first.height,
-	}
-    ];
-    var levels = [first_regions];
-    console.log(levels);
-
-    var level_index = 0;
-    var region_index = 0;
-    var box_index = 1;
-    var bump_count = 0;
-    while (box_index < box_list.length && bump_count < 4)
+    var whole_box = {left:0,top:0,width:500,height:500};
+    function center(box)
     {
-	var level = levels[level_index];
-	var region = level[region_index];
-	var box = box_list[box_index];
-
-	var bump = function()
+	return {
+	    x:box.left + box.width / 2,
+	    y:box.top + box.height / 2
+	};
+    }
+    var whole_center = center(whole_box);
+    
+    function place(box, free_box)
+    {
+	if ((box.width > free_box.width) ||
+	    (box.height > free_box.height))
 	{
-	    region_index++;
-	    if (region_index == level.length)
-	    {
-		region_index = 0;
-	    }
-	    bump_count++;
+	    return undefined;
 	}
 	
-	if (region.orientation === "left")
-	{
-	    if (region.origin + box.width > region.limit)
-	    {
-		bump();
-		continue;
-	    }
-	    box.top = region.base - box.height;
-	    box.left = region.origin;
-	    region.origin = region.origin + box.width;
+	var rval = { width: box.width, height: box.height };
+	var between = function(x, a, b) {
+	    return x >= a && x <= b;
 	}
-	else if (region.orientation === "top")
-	{
-	    if (region.origin + box.height > region.limit)
-	    {
-		bump();
-		continue;
+	var free = [];
+
+	var a = free_box.left + box.width / 2;
+	var b = free_box.left + free_box.width - box.width / 2;
+	var c = free_box.top + box.height / 2;
+	var d = free_box.top + free_box.height - box.height / 2;
+
+	var x = whole_center.x;
+	var y = whole_center.y;
+
+	var e = free_box.top + box.height;
+	var f = free_box.top + free_box.height - box.height;
+	var g = free_box.left + box.width;
+	var h = free_box.left + free_box.width - box.width;
+
+	if (between(x, a, b)) {
+	    box.left = free_box.left + x - a;
+	    if (y <= c) {
+		// 1
+		box.top = free_box.top;
+	    } else {
+		// 5
+		box.top = f;
 	    }
-	    box.top = region.origin;
-	    box.left = region.base;
-	    region.origin = region.origin + box.height;
-	}
-	else if (region.orientation === "right")
-	{
-	    if (region.origin - box.width < region.limit)
-	    {
-		bump();
-		continue;
+	} else if (between(y, c, d)) {
+	    box.top = free_box.top + y - c;
+	    if (x <= a) {
+		// 7
+		box.left = free_box.left;
+	    } else {
+		// 3
+		box.left = h;
 	    }
-	    box.top = region.base;
-	    box.left = region.origin - box.width;
-	    region.origin = region.origin - box.width;
-	}
-	else if (region.orientation === "bottom")
-	{
-	    if (region.origin - box.height < region.limit)
-	    {
-		bump();
-		continue;
+	} else if (x >= b) {
+	    box.left = h;
+	    if (y <= c) {
+		// 2
+		box.top = free_box.top;
+	    } else {
+		// 4
+		box.top = f;
 	    }
-	    box.top = region.origin - box.height;
-	    box.left = region.base - box.width;
-	    region.origin = region.origin - box.height;
+	} else if (x <= a) {
+	    box.left = free_box.left;
+	    if (y <= c) {
+		// 8
+		box.top = free_box.top;
+	    } else {
+		// 6
+		box.top = f;
+	    }
 	}
+    }
+
+    function free_boxes(box, free_box)
+    {
+	return _.filter([{ // 1 2
+	    left:box.left,
+	    top:free_box.top,
+	    width:box.width+free_box.left+free_box.width-box.left,
+	    height:box.top-free_box.top
+	},{ // 3 4
+	    left:box.left+box.width,
+	    top:box.top,
+            width:free_box.left+free_box.width-box.left,
+	    height:box.height+free_box.top+free_box.height-box.top
+	},{ // 5 6
+	    left:free_box.left,
+	    top:box.top+box.height,
+	    width:box.left-free_box.left+box.width,
+	    height:free_box.top+free_box.height-box.top
+	},{ // 7 8
+	    left:free_box.left,
+	    top:free_box.top,
+	    width:box.left-free_box.left,
+	    height:box.top-free_box.top+box.height
+	}], function(box){
+	    return box.width > 0.001 && box.height > 0.001;
+	});
+    }
+
+    var box = _.first(box_list);
+    box.left = center(whole_box).x - box.width / 2;
+    box.top = center(whole_box).y - box.height / 2;
+    plot_box(box);
+    free_list = free_boxes(box, whole_box);
+
+    _.each(_.rest(box_list), function(box){
+	var free_box = _.min(free_list, function(free_box) {
+	    place(box, free_box);
+	    var x = box.left + box.width/2;
+	    var y = box.top + box.height/2;
+	    return x*x+y*y;
+	});
+	
+	place(box, free_box);
 	plot_box(box);
 
-	bump();
-	bump_count = 0;
-    	box_index++;
-    }
+	free_list = _.without(free_list, free_box);
+	free_list = free_list.concat(free_boxes(box, free_box));	
+    });
 }
 
 function getRandomColor() {
