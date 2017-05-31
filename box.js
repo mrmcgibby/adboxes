@@ -1,26 +1,38 @@
-var boxes = [
-    {width:24, height:10, payment:38, clicks:693},
-    {width:15, height:20, payment:75, clicks:1106},
-    {width:21, height:18, payment:114, clicks:182},
-    {width:15, height:15, payment:190, clicks:1902},
-    {width:10, height:27, payment:93, clicks:791},
-    {width:27, height:22, payment:203, clicks:116},
-    {width:20, height:15, payment:25, clicks:1381},
-    {width:16, height:20, payment:30, clicks:318},
-    {width:14, height:13, payment:126, clicks:1535},
-    {width:18, height:26, payment:90, clicks:1587},
-    {width:16, height:18, payment:106, clicks:768},
-    {width:16, height:12, payment:35, clicks:1172},
-    {width:14, height:28, payment:135, clicks:690},
-    {width:16, height:20, payment:76, clicks:1546},
-    {width:15, height:28, payment:54, clicks:1654},
-    {width:16, height:10, payment:192, clicks:1685},
-    {width:17, height:23, payment:56, clicks:10},
-    {width:22, height:18, payment:139, clicks:1938},
-    {width:12, height:25, payment:75, clicks:554},
-    {width:16, height:25, payment:48, clicks:337},
-    {width:24, height:18, payment:199, clicks:1282}
-];
+// var boxes = [
+//     {width:24, height:10, payment:38, clicks:693},
+//     {width:15, height:20, payment:75, clicks:1106},
+//     {width:21, height:18, payment:114, clicks:182},
+//     {width:15, height:15, payment:190, clicks:1902},
+//     {width:10, height:27, payment:93, clicks:791},
+//     {width:27, height:22, payment:203, clicks:116},
+//     {width:20, height:15, payment:25, clicks:1381},
+//     {width:16, height:20, payment:30, clicks:318},
+//     {width:14, height:13, payment:126, clicks:1535},
+//     {width:18, height:26, payment:90, clicks:1587},
+//     {width:16, height:18, payment:106, clicks:768},
+//     {width:16, height:12, payment:35, clicks:1172},
+//     {width:14, height:28, payment:135, clicks:690},
+//     {width:16, height:20, payment:76, clicks:1546},
+//     {width:15, height:28, payment:54, clicks:1654},
+//     {width:16, height:10, payment:192, clicks:1685},
+//     {width:17, height:23, payment:56, clicks:10},
+//     {width:22, height:18, payment:139, clicks:1938},
+//     {width:12, height:25, payment:75, clicks:554},
+//     {width:16, height:25, payment:48, clicks:337},
+//     {width:24, height:18, payment:199, clicks:1282}
+// ];
+
+var boxes = [];
+for (var i = 0; i < 200; i++)
+{
+    var box = {
+	width:Math.random()*50,
+	height:Math.random()*50,
+	payment:1,
+	clicks:1
+    };
+    boxes[boxes.length] = box;
+}
 
 function box_size(box)
 {
