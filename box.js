@@ -25,12 +25,28 @@
 var boxes = [];
 for (var i = 0; i < 200; i++)
 {
-    var box = {
-	width:Math.random()*50,
-	height:Math.random()*50,
+    var box_array = [{
+	width:20,
+	height:20,
 	payment:1,
 	clicks:1
-    };
+    },{
+	width:20,
+	height:40,
+	payment:1,
+	clicks:1
+    },{
+	width:40,
+	height:20,
+	payment:1,
+	clicks:1
+    },{
+	width:40,
+	height:40,
+	payment:1,
+	clicks:1
+    }];
+    var box = box_array[Math.floor(Math.random()*box_array.length)];
     boxes[boxes.length] = box;
 }
 
@@ -78,10 +94,8 @@ function plot(box_list)
 	}
 	var free = [];
 
-	var a = free_box.left + box.width / 2;
-	var b = free_box.left + free_box.width - box.width / 2;
-	var c = free_box.top + box.height / 2;
-	var d = free_box.top + free_box.height - box.height / 2;
+	var a = free_box.left + free_box.width / 2;
+	var c = free_box.top + free_box.height / 2;
 
 	var x = whole_center.x;
 	var y = whole_center.y;
@@ -91,25 +105,7 @@ function plot(box_list)
 	var g = free_box.left + box.width;
 	var h = free_box.left + free_box.width - box.width;
 
-	if (between(x, a, b)) {
-	    box.left = free_box.left + x - a;
-	    if (y <= c) {
-		// 1
-		box.top = free_box.top;
-	    } else {
-		// 5
-		box.top = f;
-	    }
-	} else if (between(y, c, d)) {
-	    box.top = free_box.top + y - c;
-	    if (x <= a) {
-		// 7
-		box.left = free_box.left;
-	    } else {
-		// 3
-		box.left = h;
-	    }
-	} else if (x >= b) {
+	if (x >= a) {
 	    box.left = h;
 	    if (y <= c) {
 		// 2
@@ -118,7 +114,7 @@ function plot(box_list)
 		// 4
 		box.top = f;
 	    }
-	} else if (x <= a) {
+	} else {
 	    box.left = free_box.left;
 	    if (y <= c) {
 		// 8
@@ -170,7 +166,7 @@ function plot(box_list)
 	    place(box, free_box);
 	    var x = box.left + box.width/2 - cx;
 	    var y = box.top + box.height/2 - cy;
-	    return x*x+y*y;
+	    return Math.pow(x,100)+Math.pow(y,100);
 	});
 	
 	place(box, free_box);
