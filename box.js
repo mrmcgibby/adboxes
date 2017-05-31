@@ -23,30 +23,36 @@
 // ];
 
 var boxes = [];
-for (var i = 0; i < 200; i++)
+for (var i = 0; i < 500; i++)
 {
-    var box_array = [{
-	width:20,
-	height:20,
+    // var box_array = [{
+    // 	width:20,
+    // 	height:20,
+    // 	payment:1,
+    // 	clicks:1
+    // },{
+    // 	width:20,
+    // 	height:40,
+    // 	payment:1,
+    // 	clicks:1
+    // },{
+    // 	width:40,
+    // 	height:20,
+    // 	payment:1,
+    // 	clicks:1
+    // },{
+    // 	width:40,
+    // 	height:40,
+    // 	payment:1,
+    // 	clicks:1
+    // }];
+    // var box = box_array[Math.floor(Math.random()*box_array.length)];
+    var box = {
+	width:Math.random()*20,
+	height:Math.random()*20,
 	payment:1,
 	clicks:1
-    },{
-	width:20,
-	height:40,
-	payment:1,
-	clicks:1
-    },{
-	width:40,
-	height:20,
-	payment:1,
-	clicks:1
-    },{
-	width:40,
-	height:40,
-	payment:1,
-	clicks:1
-    }];
-    var box = box_array[Math.floor(Math.random()*box_array.length)];
+    };
     boxes[boxes.length] = box;
 }
 
