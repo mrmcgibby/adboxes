@@ -123,39 +123,41 @@ function plot(box_list)
 	return _.filter([{ // 1 2
 	    left:box.left,
 	    top:free_box.top,
-	    width:box.width+free_box.left+free_box.width-box.left,
+	    width:free_box.left+free_box.width-box.left,
 	    height:box.top-free_box.top
 	},{ // 3 4
 	    left:box.left+box.width,
 	    top:box.top,
-            width:free_box.left+free_box.width-box.left,
-	    height:box.height+free_box.top+free_box.height-box.top
+            width:free_box.left+free_box.width-box.left-box.width,
+	    height:free_box.top+free_box.height-box.top
 	},{ // 5 6
 	    left:free_box.left,
 	    top:box.top+box.height,
 	    width:box.left-free_box.left+box.width,
-	    height:free_box.top+free_box.height-box.top
+	    height:free_box.top+free_box.height-box.top-box.height
 	},{ // 7 8
 	    left:free_box.left,
 	    top:free_box.top,
 	    width:box.left-free_box.left,
-	    height:box.top-free_box.top+box.height
+	    height:box.top+box.height-free_box.top
 	}], function(box){
 	    return box.width > 0.001 && box.height > 0.001;
 	});
     }
 
     var box = _.first(box_list);
-    box.left = center(whole_box).x - box.width / 2;
-    box.top = center(whole_box).y - box.height / 2;
+    var cx = center(whole_box).x;
+    var cy = center(whole_box).y;
+    box.left = cx - box.width / 2;
+    box.top = cy - box.height / 2;
     plot_box(box);
     free_list = free_boxes(box, whole_box);
 
     _.each(_.rest(box_list), function(box){
 	var free_box = _.min(free_list, function(free_box) {
 	    place(box, free_box);
-	    var x = box.left + box.width/2;
-	    var y = box.top + box.height/2;
+	    var x = box.left + box.width/2 - cx;
+	    var y = box.top + box.height/2 - cy;
 	    return x*x+y*y;
 	});
 	
