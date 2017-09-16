@@ -47,13 +47,33 @@ for (var i = 0; i < 500; i++)
     // 	clicks:1
     // }];
     // var box = box_array[Math.floor(Math.random()*box_array.length)];
+    var area = Math.pow(Math.random(), 5)*18+2;
+    var aspects = [0.5, 0.75, 1, 1.5, 2];
+    //var aspects = [1.5];
+    var aspect = aspects[Math.floor(Math.random()*aspects.length)];
     var box = {
-	width:Math.random()*20,
-	height:Math.random()*20,
+	width:area/aspect,
+	height:area*aspect,
 	payment:1,
 	clicks:1
     };
     boxes[boxes.length] = box;
+}
+
+function normalize(box_list)
+{
+    var total_payment = _.reduce(box_list, function(a, b){
+	return a.payment + b.payment;
+    });
+    var total_clicks = _.reduce(box_list, function(a, b){
+	return a.clicks + b.click;
+    });
+    _.each(box_list, function(box) {
+	var new_area = box.payment / total_payment + box.clicks / total_clicks;
+	var adj = Math.sqrt(new_area);
+	box.width = box.width / adj;
+	box.height = box.height / adj;
+    });
 }
 
 function box_size(box)
@@ -196,6 +216,7 @@ $(document).ready(function(){
     var sorted = _.sortBy(boxes, function(box){
 	return -box_size(box);
     });
+    normalize(sorted);
     plot(sorted);
     console.log(sorted);
     var index = 1;
