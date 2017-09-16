@@ -23,7 +23,7 @@
 // ];
 
 var boxes = [];
-for (var i = 0; i < 500; i++)
+for (var i = 0; i < 1000; i++)
 {
     // var box_array = [{
     // 	width:20,
@@ -49,28 +49,30 @@ for (var i = 0; i < 500; i++)
     // var box = box_array[Math.floor(Math.random()*box_array.length)];
     var area = Math.pow(Math.random(), 5)*18+2;
     var aspects = [0.5, 0.75, 1, 1.5, 2];
-    //var aspects = [1.5];
+    //    var aspects = [0.5, 1, 2];
     var aspect = aspects[Math.floor(Math.random()*aspects.length)];
     var box = {
-	width:area/aspect,
-	height:area*aspect,
+	width:area/Math.sqrt(aspect),
+	height:area*Math.sqrt(aspect),
 	payment:1,
 	clicks:1
     };
     boxes[boxes.length] = box;
 }
 
+var metric = 100;
+
 function normalize(box_list)
 {
-    var total_payment = _.reduce(box_list, function(a, b){
-	return a.payment + b.payment;
-    });
-    var total_clicks = _.reduce(box_list, function(a, b){
-	return a.clicks + b.click;
-    });
+    var total_payment = _.reduce(box_list, function(memo, box){
+	return memo + box.payment;
+    }, 0);
+    var total_clicks = _.reduce(box_list, function(memo, box){
+	return memo + box.clicks;
+    }, 0);
     _.each(box_list, function(box) {
 	var new_area = box.payment / total_payment + box.clicks / total_clicks;
-	var adj = Math.sqrt(new_area);
+	var adj = Math.sqrt(new_area)*10;
 	box.width = box.width / adj;
 	box.height = box.height / adj;
     });
@@ -96,7 +98,9 @@ function plot_box(box)
 
 function plot(box_list)
 {
-    var whole_box = {left:0,top:0,width:500,height:500};
+    var mainbox = $("#mainbox");
+    //var whole_box = {left:0,top:0,width:500,height:500};
+    var whole_box = {left:0,top:0,width:mainbox.width(),height:mainbox.height()};
     function center(box)
     {
 	return {
@@ -115,9 +119,9 @@ function plot(box_list)
 	}
 	
 	var rval = { width: box.width, height: box.height };
-	var between = function(x, a, b) {
-	    return x >= a && x <= b;
-	}
+	// var between = function(x, a, b) {
+	//     return x >= a && x <= b;
+	// }
 	var free = [];
 
 	var a = free_box.left + free_box.width / 2;
@@ -184,7 +188,6 @@ function plot(box_list)
     var cy = center(whole_box).y;
     box.left = cx - box.width / 2;
     box.top = cy - box.height / 2;
-    plot_box(box);
     free_list = free_boxes(box, whole_box);
 
     _.each(_.rest(box_list), function(box){
@@ -192,15 +195,33 @@ function plot(box_list)
 	    place(box, free_box);
 	    var x = box.left + box.width/2 - cx;
 	    var y = box.top + box.height/2 - cy;
-	    return Math.pow(x,100)+Math.pow(y,100);
+	    return Math.pow(x,metric)+Math.pow(y,metric);
 	});
 	
 	place(box, free_box);
-	plot_box(box);
 
 	free_list = _.without(free_list, free_box);
 	free_list = free_list.concat(free_boxes(box, free_box));	
     });
+
+    // find the bounding box of all the boxes
+    var bounds = _.reduce(box_list, function(memo, box){
+	return {
+	    left:_.min([memo.left, box.left]),
+	    top:_.min([memo.top, box.top]),
+	    right:_.max([memo.right, box.left+box.width]),
+	    bottom:_.max([memo.bottom, box.top+box.height])
+	};
+    },{
+	left:mainbox.width()/2,
+	top:mainbox.height()/2,
+	right:mainbox.width()/2,
+	bottom:mainbox.height()/2
+    });
+
+    // TODO adjust the box
+
+    _.each(box_list, plot_box);
 }
 
 function getRandomColor() {
